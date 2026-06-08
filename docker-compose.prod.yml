@@ -1,0 +1,26 @@
+services:
+  backend:
+    environment:
+      OMRS_DEV_DEBUG_PORT: ""
+      JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "false"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "false"
+      OMRS_CONFIG_CREATE_TABLES: "false"
+      OMRS_CONFIG_CONNECTION_USERNAME: "{OMRS_DB_USER}"
+      OMRS_CONFIG_CONNECTION_PASSWORD: "{OMRS_DB_PASSWORD}"
+    
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+
+  db:
+    environment:
+      MYSQL_USER: ${OMRS_DB_USER}
+      MYSQL_PASSWORD: ${OMRS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${OMRS_DB_ROOT_PASSWORD}
+    
+    deploy:
+      resources:
+        limits:
+          memory: 512m
