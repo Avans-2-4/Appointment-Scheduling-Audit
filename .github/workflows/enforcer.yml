@@ -14,5 +14,5 @@ jobs:
       - name: Check branch
         if: github.base_ref == 'main' && (github.head_ref != 'develop' || github.event.pull_request.head.repo.full_name != github.repository)
         run: |
-          echo "ERROR: You can only merge to main from develop."
+          echo "::error::You can only merge to main from develop."
           exit 1
