@@ -1,6 +1,29 @@
 services:
+  gateway:
+    ports:
+      - "8080:80"
   backend:
     environment:
       OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
       OMRS_CONFIG_AUTO_UPDATE_DATABASE: "false"
       OMRS_CONFIG_CREATE_TABLES: "false"
+    volumes:
+      - acc-openmrs-data:/openmrs/data
+
+  db:
+    volumes:
+      - acc-db-data:/var/lib/mysql
+
+volumes:
+  acc-openmrs-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/appointment-audit/stacks/acc/openmrs-data
+  acc-db-data:
+    driver: local
+    dirver_opts:
+      type: none
+      o: bind
+      device: /opt/appointment-audit/stacks/acc/db-data
