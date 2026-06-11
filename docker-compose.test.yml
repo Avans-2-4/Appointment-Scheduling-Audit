@@ -9,3 +9,13 @@ services:
       OMRS_CONFIG_CREATE_TABLES: "true"
     ports:
       - "8080:8080"
+    volumes:
+      - openmrs-data:/openmrs/data
+
+  db:
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  openmrs-data:
+  db-data:
