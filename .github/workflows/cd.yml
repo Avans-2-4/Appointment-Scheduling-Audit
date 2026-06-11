@@ -6,16 +6,16 @@ on:
     types: [completed]
     branches: ["main"]
 
-permissions:
-  contents: read
-  actions: read
-
 jobs:
   deploy-acceptance:
     name: Deploy to Acceptance
     runs-on: ubuntu-latest
     environment: acceptance
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      contents: read
+      actions: read
 
     steps:
       - name: Download omod artifact
@@ -49,6 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-acceptance
     environment: production
+
+    permissions:
+      contents: read
+      actions: read
 
     steps:
       - name: Download omod artifact
