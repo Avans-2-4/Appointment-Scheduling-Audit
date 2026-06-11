@@ -1,0 +1,36 @@
+services:
+  gateway:
+    ports:
+      - "80:80"
+
+  backend:
+    environment:
+      OMRS_DEV_DEBUG_PORT: ""
+      JAVA_TOOL_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "false"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
+      OMRS_CONFIG_CREATE_TABLES: "true"
+      OMRS_CONFIG_CONNECTION_USERNAME: ${OMRS_DB_USER}
+      OMRS_CONFIG_CONNECTION_PASSWORD: ${OMRS_DB_PASSWORD}
+    volumes:
+      - prod-openmrs-data:/openmrs/data
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+
+  db:
+    environment:
+      MYSQL_USER: ${OMRS_DB_USER}
+      MYSQL_PASSWORD: ${OMRS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - prod-db-data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+volumes:
+  prod-openmrs-data:
+  prod-db-data:

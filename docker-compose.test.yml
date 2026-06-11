@@ -1,0 +1,21 @@
+services:
+  gateway:
+    ports: !reset []
+
+  backend:
+    environment:
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
+      OMRS_CONFIG_CREATE_TABLES: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - openmrs-data:/openmrs/data
+
+  db:
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  openmrs-data:
+  db-data:
