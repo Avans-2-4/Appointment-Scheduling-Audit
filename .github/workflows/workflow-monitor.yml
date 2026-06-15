@@ -25,7 +25,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
-            🔔 **Workflow File Changed**
+            **Workflow File Changed**
             
             **Repository:** ${{ github.repository }}
             **Branch:** ${{ github.ref_name }}
