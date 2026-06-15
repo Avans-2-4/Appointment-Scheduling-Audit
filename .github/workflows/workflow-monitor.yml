@@ -15,10 +15,16 @@ jobs:
       - name: Get commit info
         id: commit
         run: |
-          echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
-          echo "message=$(git log -1 --pretty=format:'%B')" >> $GITHUB_OUTPUT
-          echo "sha=$(git log -1 --pretty=format:'%h')" >> $GITHUB_OUTPUT
-          echo "url=${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "author=$(git log -1 --pretty=format:'%an')" >> ${GITHUB_OUTPUT}
+          echo "sha=$(git log -1 --pretty=format:'%h')" >> ${GITHUB_OUTPUT}
+          echo "url=${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" >> ${GITHUB_OUTPUT}
+          
+          # Handle multiline message safely
+          MESSAGE=$(git log -1 --pretty=format:'%B')
+          MESSAGE="${MESSAGE//'%'/'%25'}"
+          MESSAGE="${MESSAGE//$'\n'/'%0A'}"
+          MESSAGE="${MESSAGE//$'\r'/'%0D'}"
+          echo "message=${MESSAGE}" >> ${GITHUB_OUTPUT}
 
       - name: Send Discord notification
         uses: tsickert/discord-webhook@c840d45a03a323fbc3f7507ac7769dbd91bfb164
