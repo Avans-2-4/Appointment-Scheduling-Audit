@@ -1,0 +1,34 @@
+name: Notify on .github/workflows changes
+
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get commit info
+        id: commit
+        run: |
+          echo "author=$(git log -1 --pretty=format:'%an')" >> $GITHUB_OUTPUT
+          echo "message=$(git log -1 --pretty=format:'%B')" >> $GITHUB_OUTPUT
+          echo "sha=$(git log -1 --pretty=format:'%h')" >> $GITHUB_OUTPUT
+          echo "url=${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Send Discord notification
+        uses: tsickert/discord-webhook@c840d45a03a323fbc3f7507ac7769dbd91bfb164
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
+            **Workflow File Changed**
+            
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Author:** ${{ steps.commit.outputs.author }}
+            **Commit:** [${{ steps.commit.outputs.sha }}](${{ steps.commit.outputs.url }})
+            **Message:** ${{ steps.commit.outputs.message }}
