@@ -1,0 +1,25 @@
+name: Notify on new pull requests
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        uses: tsickert/discord-webhook@c840d45a03a323fbc3f7507ac7769dbd91bfb164
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL_PR }}
+          content: |
+            **New Pull Request**
+            
+            **Repository:** ${{ github.repository }}
+            **Title:** ${{ github.event.pull_request.title }}
+            **Author:** ${{ github.event.pull_request.user.login }}
+            **Branch:** ${{ github.event.pull_request.head.ref }}
+            **URL:** ${{ github.event.pull_request.html_url }}
+            
+            **Description:**
+            ${{ github.event.pull_request.body }}
