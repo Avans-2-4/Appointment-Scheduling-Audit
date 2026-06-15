@@ -1,0 +1,20 @@
+services:
+  gateway:
+    ports:
+      - "8080:80"
+
+  backend:
+    environment:
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
+      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
+      OMRS_CONFIG_CREATE_TABLES: "true"
+    volumes:
+      - acc-openmrs-data:/openmrs/data
+
+  db:
+    volumes:
+      - acc-db-data:/var/lib/mysql
+
+volumes:
+  acc-openmrs-data:
+  acc-db-data:

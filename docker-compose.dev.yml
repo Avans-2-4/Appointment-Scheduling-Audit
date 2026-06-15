@@ -1,0 +1,20 @@
+services:
+  gateway:
+    ports:
+      - "80:80"
+      - "5005:5005"
+
+  backend:
+    environment:
+      OMRS_DEV_DEBUG_PORT: "5005"
+      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
+    volumes:
+      - openmrs-data:/openmrs/data
+
+  db:
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  openmrs-data:
+  db-data:
