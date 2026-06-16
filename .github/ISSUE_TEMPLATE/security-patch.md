@@ -2,7 +2,7 @@
 name: Security Patch
 about: This is for issues that have security precoutions.
 title: "[SECURITY] "
-labels: ''
+labels: 'Security'
 assignees: ''
 
 ---
