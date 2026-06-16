@@ -54,6 +54,9 @@
 		<reportingModuleVersion>0.9.2</reportingModuleVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.organization>avans-2-4</sonar.organization>
+		<sonar.projectKey>Avans-2-4_Appointment-Scheduling-Audit</sonar.projectKey>
 	</properties>
 
     <dependencies>
