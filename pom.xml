@@ -47,7 +47,7 @@
 	</modules>
 	
 	<properties>
-		<openMRSVersion>1.9.9</openMRSVersion>
+		<openMRSVersion>2.8.7</openMRSVersion>
 		<webservicesRestVersion>3.5.0</webservicesRestVersion>
 		<serializationXstreamModuleVersion>0.3.0</serializationXstreamModuleVersion>
 		<calculationModuleVersion>1.0</calculationModuleVersion>
