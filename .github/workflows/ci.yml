@@ -31,7 +31,14 @@ jobs:
       - name: Build and test
         run: mvn clean install --batch-mode
 
+      - name: Set up Java 17 for Sonar
+        uses: actions/setup-java@v5
+        with:
+            java-version: "17"
+            distribution: "temurin"
+
       - name: Analyze with SonarQube Cloud
+        run: mvn sonar:sonar --batch-mode
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
