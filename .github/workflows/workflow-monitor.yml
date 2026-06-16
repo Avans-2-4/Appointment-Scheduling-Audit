@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get commit info
         id: commit
@@ -27,7 +27,7 @@ jobs:
           echo "message=${MESSAGE}" >> ${GITHUB_OUTPUT}
 
       - name: Send Discord notification
-        uses: tsickert/discord-webhook@c840d45a03a323fbc3f7507ac7769dbd91bfb164
+        uses: tsickert/discord-webhook@b217a69502f52803de774ded2b1ab7c282e99645
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
