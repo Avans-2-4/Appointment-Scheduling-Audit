@@ -18,8 +18,13 @@
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<!-- Add here beans related to the API context -->
-
 	
+	<!-- Enable AspectJ proxy support for AOP interception -->
+	<aop:aspectj-autoproxy />
+	
+	<!-- Scan for @Component annotated classes in audit package -->
+	<context:component-scan base-package="org.openmrs.module.appointmentscheduling.audit" />
+
 	<!-- Services accessible via Context.getService() -->
 	<bean parent="serviceContext">
 		<property name="moduleService">
