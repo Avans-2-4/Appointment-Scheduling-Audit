@@ -35,5 +35,5 @@ jobs:
     - name: Scan the image and upload dependency results
       uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
       with:
-        path: "."
+        image: "localbuild/testimage:latest"
         dependency-snapshot: true
