@@ -31,9 +31,9 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag localbuild/testimage:latest
+      run: docker build . --file Dockerfile --tag appointmentscheduling/sbom:latest
     - name: Scan the image and upload dependency results
       uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
       with:
-        image: "localbuild/testimage:latest"
+        image: "appointmentscheduling/sbom:latest"
         dependency-snapshot: true
