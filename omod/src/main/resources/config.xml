@@ -8,7 +8,7 @@
 	<version>${project.parent.version}</version>
 	<package>${project.parent.groupId}.${project.parent.artifactId}
 	</package>
-	<author>Tobin,Adam,Yonatan</author>
+	<author>Tobin,Adam,Yonatan,Liam,Martijn,Christian</author>
 	<description>
 		${project.parent.description}
 	</description>
