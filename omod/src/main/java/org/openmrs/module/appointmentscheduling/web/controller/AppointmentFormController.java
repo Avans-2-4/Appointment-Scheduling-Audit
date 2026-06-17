@@ -39,6 +39,7 @@ import org.openmrs.module.appointmentscheduling.Appointment.AppointmentStatus;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
 import org.openmrs.module.appointmentscheduling.validator.AppointmentValidator;
 import org.openmrs.module.appointmentscheduling.web.AppointmentTypeEditor;
+import org.openmrs.module.appointmentscheduling.web.LocationEditor;
 import org.openmrs.module.appointmentscheduling.web.ProviderEditor;
 import org.openmrs.module.appointmentscheduling.web.TimeSlotEditor;
 import org.openmrs.web.WebConstants;
@@ -66,9 +67,10 @@ public class AppointmentFormController {
 		binder.registerCustomEditor(TimeSlot.class, new TimeSlotEditor());
 		binder.registerCustomEditor(AppointmentType.class, new AppointmentTypeEditor());
 		binder.registerCustomEditor(Provider.class, new ProviderEditor());
+		binder.registerCustomEditor(Location.class, new LocationEditor());
 	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentForm", method = RequestMethod.GET)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentForm.form", method = RequestMethod.GET)
 	public void showForm(ModelMap model, HttpServletRequest request) {
 		if (Context.isAuthenticated()) {
 			model.put("selectedLocation", Context.getUserContext().getLocation());
@@ -182,7 +184,7 @@ public class AppointmentFormController {
 		return Context.getService(AppointmentService.class).getAllAppointmentTypesSorted(false);
 	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentForm", method = RequestMethod.POST)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentForm.form", method = RequestMethod.POST)
 	public String onSubmit(HttpServletRequest request, Appointment appointment, BindingResult result,
 	        @RequestParam(value = "fromDate", required = false) Date fromDate,
 	        @RequestParam(value = "toDate", required = false) Date toDate,

@@ -20,9 +20,12 @@ import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appointmentscheduling.AppointmentType;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
+import org.openmrs.module.appointmentscheduling.web.LocationEditor;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,8 +48,13 @@ public class AppointmentBlockCalendarController {
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
+
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(Location.class, new LocationEditor());
+	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentBlockCalendar", method = RequestMethod.GET)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentBlockCalendar.list", method = RequestMethod.GET)
 	public void showForm(HttpServletRequest request, ModelMap model) throws ParseException {
 		if (Context.isAuthenticated()) {
 			//Set the location from the session
@@ -130,7 +138,7 @@ public class AppointmentBlockCalendarController {
 		return Context.getService(AppointmentService.class).getAllProvidersSorted(false);
 	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentBlockCalendar", method = RequestMethod.POST)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentBlockCalendar.list", method = RequestMethod.POST)
 	public String loadForm(HttpServletRequest request, ModelMap model,
 	        @RequestParam(value = "action", required = false) String action,
 	        @RequestParam(value = "locationId", required = false) Location location,

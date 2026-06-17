@@ -27,6 +27,7 @@ import org.openmrs.module.appointmentscheduling.AppointmentUtils;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
 import org.openmrs.module.appointmentscheduling.web.AppointmentEditor;
 import org.openmrs.module.appointmentscheduling.web.AppointmentTypeEditor;
+import org.openmrs.module.appointmentscheduling.web.LocationEditor;
 import org.openmrs.module.appointmentscheduling.web.ProviderEditor;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
@@ -53,6 +54,7 @@ public class AppointmentListController {
 		binder.registerCustomEditor(AppointmentType.class, new AppointmentTypeEditor());
 		binder.registerCustomEditor(Appointment.class, new AppointmentEditor());
 		binder.registerCustomEditor(Provider.class, new ProviderEditor());
+		binder.registerCustomEditor(Location.class, new LocationEditor());
 	}
 	
 	@ModelAttribute("providerSelect")
@@ -221,11 +223,11 @@ public class AppointmentListController {
 		model.put("sortableWaitingTimes", sortableTimes);
 	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentList", method = RequestMethod.GET)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentList.list", method = RequestMethod.GET)
 	public void showForm(ModelMap model) {
 	}
 	
-	@RequestMapping(value = "/module/appointmentscheduling/appointmentList", method = RequestMethod.POST)
+	@RequestMapping(value = "/module/appointmentscheduling/appointmentList.list", method = RequestMethod.POST)
 	public String onSubmit(HttpServletRequest request, @ModelAttribute("appointmentList") List<Appointment> appointmentList,
 	        Errors errors, @RequestParam(value = "selectAppointment", required = false) Appointment selectedAppointment,
 	        ModelMap model, @RequestParam(value = "fromDate", required = false) Date fromDate,

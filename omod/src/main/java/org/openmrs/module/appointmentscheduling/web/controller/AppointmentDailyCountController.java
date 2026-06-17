@@ -9,8 +9,11 @@ import org.openmrs.module.appointmentscheduling.AppointmentDailyCount;
 import org.openmrs.module.appointmentscheduling.AppointmentUtils;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
 import org.openmrs.module.appointmentscheduling.rest.controller.AppointmentRestController;
+import org.openmrs.module.appointmentscheduling.web.LocationEditor;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +36,11 @@ import java.util.List;
 @RequestMapping("/rest/" + RestConstants.VERSION_1 + AppointmentRestController.APPOINTMENT_SCHEDULING_REST_NAMESPACE +"/dailyappointmentcount")
 @Authorized(AppointmentUtils.PRIV_VIEW_APPOINTMENTS_STATISTICS)
 public class AppointmentDailyCountController {
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Location.class, new LocationEditor());
+    }
 
     /**
      * Retrieves daily appointment count aggregates for the specified date range.
