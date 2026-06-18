@@ -68,7 +68,7 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
             return new Time(new SimpleDateFormat("HH:mm:ss")
                     .parse(new SimpleDateFormat("HH:mm:ss").format(date)).getTime());
         } catch (ParseException e) {
-            e.printStackTrace();
+            // e.printStackTrace(); // disabled bc of possible logging of medical data, and a possible extra attack vector.
             return null;
         }
     }
