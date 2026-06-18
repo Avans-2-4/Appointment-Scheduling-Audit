@@ -34,6 +34,10 @@ services:
       OMRS_CONFIG_CONNECTION_DATABASE: openmrs
       OMRS_CONFIG_CONNECTION_USERNAME: ${OMRS_DB_USER:-openmrs}
       OMRS_CONFIG_CONNECTION_PASSWORD: ${OMRS_DB_PASSWORD:-openmrs}
+      HL7_EXPORT_HOST: ${HL7_EXPORT_HOST}
+      HL7_EXPORT_USER: ${HL7_EXPORT_USER}
+      HL7_EXPORT_PASSWORD: ${HL7_EXPORT_PASSWORD}
+      HL7_DB_URL: ${HL7_DB_URL}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/openmrs"]
       timeout: 5s
