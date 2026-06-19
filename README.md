@@ -56,7 +56,10 @@ Each GitHub Environment has its own isolated set of secrets (`VPS_HOST`, `VPS_US
    ```
 
 6. **Deploy the module**
-   Log into the OpenMRS admin UI at `http://localhost/openmrs` → **Administration → Manage Modules → Add or Upgrade Module** → upload the `.omod` file.
+   Because this project is a fork of the default **Bahmni Appointment Scheduling** module (`appointmentschedulingui 2.1.0-SNAPSHOT`), both cannot run simultaneously. First remove the default module:
+   OpenMRS admin UI at `http://localhost/openmrs` → **Administration → Manage Modules** → find **Bahmni Appointment Scheduling** → click **Stop**, then **Uninstall**.
+
+   Then upload the build artifact: **Add or Upgrade Module** → select the `.omod` file from `omod/target/` → **Upload**.
 
 7. **Run tests**
    ```
