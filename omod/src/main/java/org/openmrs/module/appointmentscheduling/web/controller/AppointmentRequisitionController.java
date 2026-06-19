@@ -2,9 +2,11 @@ package org.openmrs.module.appointmentscheduling.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appointmentscheduling.Appointment;
 import org.openmrs.module.appointmentscheduling.AppointmentRequisition;
+import org.openmrs.module.appointmentscheduling.AppointmentUtils;
 import org.openmrs.module.appointmentscheduling.TimeSlot;
 import org.openmrs.module.appointmentscheduling.api.AppointmentService;
 import org.openmrs.module.appointmentscheduling.exception.TimeSlotFullException;
@@ -24,13 +26,35 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
+/**
+ * REST Controller for creating appointments.
+ * 
+ * SECURITY ARCHITECTURE: Defense in Depth
+ * - Level 1 (Endpoint): @Authorized annotation enforces privilege at controller entry point
+ * - Level 2 (Service): Service layer methods have additional @Authorized annotations
+ * - This prevents privilege bypass if service delegation is compromised.
+ * 
+ * NEN-7510-2: Requirement 3.2 - Authorization is enforced at multiple layers.
+ */
 @Controller
 @RequestMapping("/rest/" + RestConstants.VERSION_1 + AppointmentRestController.APPOINTMENT_SCHEDULING_REST_NAMESPACE + "/createappointment")
+@Authorized(AppointmentUtils.PRIV_SCHEDULE_APPOINTMENTS)
 public class AppointmentRequisitionController {
     protected final Log log = LogFactory.getLog(this.getClass());
 
+    /**
+     * Creates or books a new appointment from a requisition request.
+     * 
+     * SECURITY: Method-level @Authorized provides secondary authorization check
+     * and documents the specific operation requiring Schedule Appointments privilege.
+     * 
+     * @param appointmentRequisition the appointment requisition data
+     * @return the created appointment requisition or error details
+     * @throws ParseException if date parsing fails
+     */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
+    @Authorized(AppointmentUtils.PRIV_SCHEDULE_APPOINTMENTS)
     public AppointmentRequisition createAppointment(@RequestBody AppointmentRequisition appointmentRequisition) throws ParseException {
         AppointmentService service = Context.getService(AppointmentService.class);
         Appointment appointment = new Appointment();
@@ -59,8 +83,6 @@ public class AppointmentRequisitionController {
             errors.reject("appointmentscheduling.Appointment.error.timeSlotFull");
             return error;
         }
-
-
     }
 
 }

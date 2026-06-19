@@ -36,7 +36,20 @@ import org.openmrs.util.OpenmrsUtil;
  */
 public class DWRAppointmentService {
 	
+	/**
+	 * Retrieves patient description for appointment context.
+	 * SECURITY: Requires explicit View Appointments privilege. 
+	 * NEN-7510-2: Patient data access is logged and controlled.
+	 * 
+	 * @param patientId the patient ID to retrieve data for
+	 * @return PatientData object or null if patient not found
+	 * @throws APIAuthenticationException if user lacks View Appointments privilege
+	 */
 	public PatientData getPatientDescription(Integer patientId) {
+		// Principle of Least Privilege: Enforce explicit privilege requirement
+		// This prevents unauthorized access to patient PHI (Protected Health Information)
+		Context.requirePrivilege(AppointmentUtils.PRIV_VIEW_APPOINTMENTS);
+		
 		Patient patient = Context.getPatientService().getPatient(patientId);
 		if (patient == null)
 			return null;
@@ -60,76 +73,107 @@ public class DWRAppointmentService {
 		return patientData;
 	}
 	
+	/**
+	 * Retrieves appointment blocks for calendar view within date range.
+	 * SECURITY: Requires explicit View Provider Schedules privilege.
+	 * NEN-7510-2: Defense in Depth - Privilege checked at entry point.
+	 * 
+	 * @param fromDate start date in milliseconds
+	 * @param toDate end date in milliseconds
+	 * @param locationId optional location filter
+	 * @param providerId optional provider filter
+	 * @param appointmentTypeId optional appointment type filter
+	 * @return list of appointment block data
+	 * @throws ParseException if date parsing fails
+	 * @throws APIAuthenticationException if user lacks required privilege
+	 */
 	public List<AppointmentBlockData> getAppointmentBlocksForCalendar(Long fromDate, Long toDate, Integer locationId,
 	        Integer providerId, Integer appointmentTypeId) throws ParseException {
+		// Principle of Least Privilege: Enforce explicit privilege requirement
+		Context.requirePrivilege(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS);
+		
 		List<AppointmentBlockData> appointmentBlockDatalist = new ArrayList<AppointmentBlockData>();
-		if (Context.isAuthenticated()) {
-			Calendar cal = OpenmrsUtil.getDateTimeFormat(Context.getLocale()).getCalendar();
-			cal.setTimeInMillis(fromDate);
-			Date fromDateAsDate = cal.getTime();
-			cal.setTimeInMillis(toDate);
-			Date toDateAsDate = cal.getTime();
-			
-			appointmentBlockDatalist = this.getAppointmentBlocks(Context.getDateTimeFormat().format(fromDateAsDate), Context
-			        .getDateTimeFormat().format(toDateAsDate), locationId, providerId, appointmentTypeId);
-		}
+		Calendar cal = OpenmrsUtil.getDateTimeFormat(Context.getLocale()).getCalendar();
+		cal.setTimeInMillis(fromDate);
+		Date fromDateAsDate = cal.getTime();
+		cal.setTimeInMillis(toDate);
+		Date toDateAsDate = cal.getTime();
+		
+		appointmentBlockDatalist = this.getAppointmentBlocks(Context.getDateTimeFormat().format(fromDateAsDate), Context
+		        .getDateTimeFormat().format(toDateAsDate), locationId, providerId, appointmentTypeId);
+		
 		return appointmentBlockDatalist;
 	}
 	
+	/**
+	 * Retrieves appointment blocks with optional filtering by date range, location, provider, and type.
+	 * SECURITY: Requires explicit View Provider Schedules privilege.
+	 * NEN-7510-2: Principle of Least Privilege - Strict authorization enforced.
+	 * 
+	 * @param fromDate start date as formatted string
+	 * @param toDate end date as formatted string
+	 * @param locationId optional location filter
+	 * @param providerId optional provider filter
+	 * @param appointmentTypeId optional appointment type filter
+	 * @return list of appointment block data
+	 * @throws ParseException if date parsing fails
+	 * @throws APIAuthenticationException if user lacks required privilege
+	 */
 	public List<AppointmentBlockData> getAppointmentBlocks(String fromDate, String toDate, Integer locationId,
 	        Integer providerId, Integer appointmentTypeId) throws ParseException {
+		// Principle of Least Privilege: Enforce explicit privilege requirement
+		Context.requirePrivilege(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS);
+		
 		List<AppointmentBlock> appointmentBlockList = new ArrayList<AppointmentBlock>();
 		List<AppointmentBlockData> appointmentBlockDatalist = new ArrayList<AppointmentBlockData>();
 		Date fromAsDate = null;
 		Date toAsDate = null;
 		Provider provider = null;
 		AppointmentType appointmentType = null;
-		//location needs authentication
-		if (Context.isAuthenticated()) {
-			AppointmentService appointmentService = Context.getService(AppointmentService.class);
-			Location location = null;
-			//In case the user selected a locaiton
-			if (locationId != null) {
-				location = Context.getLocationService().getLocation(locationId);
-			}
-			//In case the user selected a date.
-			if (!fromDate.isEmpty()) {
-				fromAsDate = Context.getDateTimeFormat().parse(fromDate);
-			}
-			if (!toDate.isEmpty()) {
-				toAsDate = Context.getDateTimeFormat().parse(toDate);
-			}
-			//In case the user selected a provider.
-			if (providerId != null) {
-				provider = Context.getProviderService().getProvider(providerId);
-			}
-			//In case the user selected an appointment type.
-			if (appointmentTypeId != null) {
-				appointmentType = appointmentService.getAppointmentType(appointmentTypeId);
-			}
-			appointmentBlockList = appointmentService.getAppointmentBlocks(fromAsDate, toAsDate,
-			    buildLocationList(location), provider, appointmentType);
-			
-			for (AppointmentBlock appointmentBlock : appointmentBlockList) {
-				//don't include voided appointment blocks
-				if (!appointmentBlock.isVoided()) {
-					Set<String> typesNames = new HashSet<String>();
-					Set<AppointmentType> appointmentTypes = appointmentBlock.getTypes();
-					for (AppointmentType type : appointmentTypes) {
-						typesNames.add(type.getName());
-					}
-					String dateOnly = Context.getDateFormat().format(appointmentBlock.getStartDate());
-					String startTimeOnly = Context.getTimeFormat().format(appointmentBlock.getStartDate());
-					String endTimeOnly = Context.getTimeFormat().format(appointmentBlock.getEndDate());
-					
-					appointmentBlockDatalist.add(new AppointmentBlockData(appointmentBlock.getId(), appointmentBlock
-					        .getLocation().getName(), appointmentBlock.getProvider() != null ? appointmentBlock
-					        .getProvider().getName() : "", typesNames, dateOnly, startTimeOnly, endTimeOnly, this
-					        .getTimeSlotLength(appointmentBlock.getId()), appointmentBlock.getStartDate(), appointmentBlock
-					        .getEndDate()));
+		AppointmentService appointmentService = Context.getService(AppointmentService.class);
+		Location location = null;
+		//In case the user selected a locaiton
+		if (locationId != null) {
+			location = Context.getLocationService().getLocation(locationId);
+		}
+		//In case the user selected a date.
+		if (!fromDate.isEmpty()) {
+			fromAsDate = Context.getDateTimeFormat().parse(fromDate);
+		}
+		if (!toDate.isEmpty()) {
+			toAsDate = Context.getDateTimeFormat().parse(toDate);
+		}
+		//In case the user selected a provider.
+		if (providerId != null) {
+			provider = Context.getProviderService().getProvider(providerId);
+		}
+		//In case the user selected an appointment type.
+		if (appointmentTypeId != null) {
+			appointmentType = appointmentService.getAppointmentType(appointmentTypeId);
+		}
+		appointmentBlockList = appointmentService.getAppointmentBlocks(fromAsDate, toAsDate,
+		    buildLocationList(location), provider, appointmentType);
+		
+		for (AppointmentBlock appointmentBlock : appointmentBlockList) {
+			//don't include voided appointment blocks
+			if (!appointmentBlock.isVoided()) {
+				Set<String> typesNames = new HashSet<String>();
+				Set<AppointmentType> appointmentTypes = appointmentBlock.getTypes();
+				for (AppointmentType type : appointmentTypes) {
+					typesNames.add(type.getName());
 				}
+				String dateOnly = Context.getDateFormat().format(appointmentBlock.getStartDate());
+				String startTimeOnly = Context.getTimeFormat().format(appointmentBlock.getStartDate());
+				String endTimeOnly = Context.getTimeFormat().format(appointmentBlock.getEndDate());
+				
+				appointmentBlockDatalist.add(new AppointmentBlockData(appointmentBlock.getId(), appointmentBlock
+				        .getLocation().getName(), appointmentBlock.getProvider() != null ? appointmentBlock
+				        .getProvider().getName() : "", typesNames, dateOnly, startTimeOnly, endTimeOnly, this
+				        .getTimeSlotLength(appointmentBlock.getId()), appointmentBlock.getStartDate(), appointmentBlock
+				        .getEndDate()));
 			}
 		}
+		
 		return appointmentBlockDatalist;
 	}
 	
@@ -292,27 +336,39 @@ public class DWRAppointmentService {
 	}
 	
 	/**
-	 * Computes the average duration (in Minutes) of a "waiting" history by appointment type
+	 * Computes the average duration (in Minutes) of a "waiting" history by appointment type.
+	 * SECURITY: Requires explicit View Appointments Statistics privilege.
+	 * NEN-7510-2: Sensitive operational metrics require explicit authorization.
 	 * 
 	 * @param fromDate The lower bound of the date interval.
-	 * @param endDate The upper bound of the date interval.
+	 * @param toDate The upper bound of the date interval.
 	 * @return An array of <String, Double> appointment_type_name, average_history_waiting_time
-	 * @throws ParseException
+	 * @throws ParseException if date parsing fails
+	 * @throws APIAuthenticationException if user lacks required privilege
 	 */
 	public Object[][] getAverageWaitingTimeByType(String fromDate, String toDate) throws ParseException {
+		// Principle of Least Privilege: Enforce explicit privilege requirement for statistics
+		Context.requirePrivilege(AppointmentUtils.PRIV_VIEW_APPOINTMENTS_STATISTICS);
+		
 		return getAverageHistoryDurationByCriteria(fromDate, toDate, AppointmentStatus.WAITING);
 	}
 	
 	/**
-	 * Computes the average duration (in Minutes) of a "in-consultation" history by appointment type
+	 * Computes the average duration (in Minutes) of a "in-consultation" history by appointment type.
+	 * SECURITY: Requires explicit View Appointments Statistics privilege.
+	 * NEN-7510-2: Sensitive operational metrics require explicit authorization.
 	 * 
 	 * @param fromDate The lower bound of the date interval.
-	 * @param endDate The upper bound of the date interval.
+	 * @param toDate The upper bound of the date interval.
 	 * @return An array of <String, Double> appointment_type_name,
 	 *         average_history_inconsultation_time
-	 * @throws ParseException
+	 * @throws ParseException if date parsing fails
+	 * @throws APIAuthenticationException if user lacks required privilege
 	 */
 	public Object[][] getAverageConsultationTimeByType(String fromDate, String toDate) throws ParseException {
+		// Principle of Least Privilege: Enforce explicit privilege requirement for statistics
+		Context.requirePrivilege(AppointmentUtils.PRIV_VIEW_APPOINTMENTS_STATISTICS);
+		
 		return getAverageHistoryDurationByCriteria(fromDate, toDate, AppointmentStatus.INCONSULTATION);
 	}
 	
