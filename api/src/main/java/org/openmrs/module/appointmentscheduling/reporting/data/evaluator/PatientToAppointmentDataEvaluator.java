@@ -18,7 +18,7 @@ public class PatientToAppointmentDataEvaluator extends AbstractToAppointmentData
 
     @Override
     protected void evaluateJoinedData(AppointmentDataDefinition definition, Map<Integer, Integer> convertedIds,
-                                      EvaluationContext context, EvaluatedAppointmentData result) throws EvaluationException {
+                                      EvaluatedAppointmentData result) throws EvaluationException {
         EvaluationContext patientEvaluationContext = new EvaluationContext();
         patientEvaluationContext.setBaseCohort(new Cohort(convertedIds.values()));
 

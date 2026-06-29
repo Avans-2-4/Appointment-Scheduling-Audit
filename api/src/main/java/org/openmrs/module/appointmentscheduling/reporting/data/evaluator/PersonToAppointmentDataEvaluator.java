@@ -8,7 +8,6 @@ import org.openmrs.module.appointmentscheduling.reporting.data.definition.Appoin
 import org.openmrs.module.appointmentscheduling.reporting.data.definition.PersonToAppointmentDataDefinition;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.service.PersonDataService;
-import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.PersonEvaluationContext;
 import org.openmrs.module.reporting.query.person.PersonIdSet;
@@ -21,7 +20,7 @@ public class PersonToAppointmentDataEvaluator extends AbstractToAppointmentDataE
 
     @Override
     protected void evaluateJoinedData(AppointmentDataDefinition definition, Map<Integer, Integer> convertedIds,
-                                      EvaluationContext context, EvaluatedAppointmentData result) throws EvaluationException {
+                                      EvaluatedAppointmentData result) throws EvaluationException {
         PersonEvaluationContext personEvaluationContext = new PersonEvaluationContext();
         personEvaluationContext.setBaseCohort(new Cohort(convertedIds.values()));
         personEvaluationContext.setBasePersons(new PersonIdSet(new HashSet<Integer>(convertedIds.values())));
