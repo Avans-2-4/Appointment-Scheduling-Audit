@@ -55,23 +55,23 @@ public class HibernateAppointmentBlockDAO extends HibernateSingleClassDAO implem
 		List<AppointmentBlock> filteredAppointmentBlocks = null;
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AppointmentBlock.class);
 		
-		criteria.add(Restrictions.eq("voided", false)); // we only want non-voided appointment blocks
-		
+		criteria.add(Restrictions.eq(AppointmentBlock.FIELD_VOIDED, false)); // we only want non-voided appointment blocks
+
 		if (locations != null && !locations.isEmpty()) {
 			String[] locationsAsArray = locations.split(",");
 			Disjunction disjunction = Restrictions.disjunction();
 			LocationService locationService = Context.getLocationService();
 			for (int i = 0; i < locationsAsArray.length; i++) {
-				disjunction.add(Restrictions.eq("location",
+				disjunction.add(Restrictions.eq(AppointmentBlock.FIELD_LOCATION,
 				    locationService.getLocation(Integer.parseInt(locationsAsArray[i]))));
 			}
 			criteria.add(disjunction);
 		}
 		if (fromDate != null) {
-			criteria.add(Restrictions.ge("startDate", fromDate));
+			criteria.add(Restrictions.ge(AppointmentBlock.FIELD_START_DATE, fromDate));
 		}
 		if (toDate != null) {
-			criteria.add(Restrictions.le("endDate", toDate));
+			criteria.add(Restrictions.le(AppointmentBlock.FIELD_END_DATE, toDate));
 		}
 		if (provider != null) {
 			criteria.add(Restrictions.eq("provider.id", provider.getProviderId()));
@@ -81,12 +81,12 @@ public class HibernateAppointmentBlockDAO extends HibernateSingleClassDAO implem
 			for (AppointmentType type : appointmentTypes) {
 				types.add(type.getAppointmentTypeId());
 			}
-			criteria.createAlias("types", "appointmentType");
+			criteria.createAlias(AppointmentBlock.FIELD_TYPES, "appointmentType");
 			criteria.add(Restrictions.in("appointmentType.id", types));
 		}
-		
-		criteria.addOrder(Order.asc("startDate"));
-		criteria.addOrder(Order.asc("endDate"));
+
+		criteria.addOrder(Order.asc(AppointmentBlock.FIELD_START_DATE));
+		criteria.addOrder(Order.asc(AppointmentBlock.FIELD_END_DATE));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
 		List<AppointmentBlock> appointmentBlocks = criteria.list();
@@ -115,26 +115,26 @@ public class HibernateAppointmentBlockDAO extends HibernateSingleClassDAO implem
 				
 				//1) create the conjunction - (fromDate>=fromDate' AND fromDate<toDate') 
 				Conjunction conjunction = Restrictions.conjunction();
-				conjunction.add(Restrictions.le("startDate", fromDate));
-				conjunction.add(Restrictions.gt("endDate", fromDate));
+				conjunction.add(Restrictions.le(AppointmentBlock.FIELD_START_DATE, fromDate));
+				conjunction.add(Restrictions.gt(AppointmentBlock.FIELD_END_DATE, fromDate));
 				//add the conjunction to the disjunction
 				disjunction.add(conjunction);
 				//2) create the conjunction - (fromDate<fromDate' AND toDate>fromDate')
 				conjunction = Restrictions.conjunction();
-				conjunction.add(Restrictions.gt("startDate", fromDate));
-				conjunction.add(Restrictions.lt("startDate", toDate));
+				conjunction.add(Restrictions.gt(AppointmentBlock.FIELD_START_DATE, fromDate));
+				conjunction.add(Restrictions.lt(AppointmentBlock.FIELD_START_DATE, toDate));
 				//add the conjunction to the disjunction
 				disjunction.add(conjunction); //the disjunction - (fromDate>=fromDate' AND fromDate<toDate') OR (fromDate<fromDate' AND toDate>fromDate')
 				criteria.add(disjunction);
 				
 				//restriction for the provider
-				criteria.add(Restrictions.eq("provider", appointmentBlock.getProvider()));
+				criteria.add(Restrictions.eq(AppointmentBlock.FIELD_PROVIDER, appointmentBlock.getProvider()));
 				if (appointmentBlock.getAppointmentBlockId() != null) {
 					//restriction for not comparing the same appointment blocks
 					criteria.add(Restrictions.ne("appointmentBlockId", appointmentBlock.getAppointmentBlockId()));
 				}
 				//restriction for ignoring "voided" appointment blocks
-				criteria.add(Restrictions.eq("voided", false));
+				criteria.add(Restrictions.eq(AppointmentBlock.FIELD_VOIDED, false));
 				
 				return criteria.list();
 			}

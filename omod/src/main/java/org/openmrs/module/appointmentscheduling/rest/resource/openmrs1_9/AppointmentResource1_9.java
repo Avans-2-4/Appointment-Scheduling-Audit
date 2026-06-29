@@ -47,14 +47,14 @@ public class AppointmentResource1_9 extends DataDelegatingCrudResource<Appointme
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("display", findMethod("getDisplayString"));
-			description.addProperty("timeSlot", Representation.DEFAULT);
+			description.addProperty(Appointment.FIELD_TIME_SLOT, Representation.DEFAULT);
 			description.addProperty("visit", Representation.REF);
-			description.addProperty("patient", Representation.DEFAULT);
-			description.addProperty("status");
+			description.addProperty(Appointment.FIELD_PATIENT, Representation.DEFAULT);
+			description.addProperty(Appointment.FIELD_STATUS);
 			description.addProperty("reason");
 			description.addProperty("cancelReason");
-			description.addProperty("appointmentType", Representation.REF);
-			description.addProperty("voided");
+			description.addProperty(Appointment.FIELD_APPOINTMENT_TYPE, Representation.REF);
+			description.addProperty(Appointment.FIELD_VOIDED);
 			description.addSelfLink();
 			description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
 			return description;
@@ -62,14 +62,14 @@ public class AppointmentResource1_9 extends DataDelegatingCrudResource<Appointme
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("display", findMethod("getDisplayString"));
-			description.addProperty("timeSlot", Representation.FULL);
+			description.addProperty(Appointment.FIELD_TIME_SLOT, Representation.FULL);
 			description.addProperty("visit", Representation.FULL);
-			description.addProperty("patient", Representation.FULL);
-			description.addProperty("status");
+			description.addProperty(Appointment.FIELD_PATIENT, Representation.FULL);
+			description.addProperty(Appointment.FIELD_STATUS);
 			description.addProperty("reason");
 			description.addProperty("cancelReason");
-			description.addProperty("appointmentType", Representation.FULL);
-			description.addProperty("voided");
+			description.addProperty(Appointment.FIELD_APPOINTMENT_TYPE, Representation.FULL);
+			description.addProperty(Appointment.FIELD_VOIDED);
 			description.addProperty("auditInfo", findMethod("getAuditInfo"));
 			description.addSelfLink();
 			return description;
@@ -81,13 +81,13 @@ public class AppointmentResource1_9 extends DataDelegatingCrudResource<Appointme
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addRequiredProperty("timeSlot");
+		description.addRequiredProperty(Appointment.FIELD_TIME_SLOT);
 		description.addProperty("visit");
-		description.addRequiredProperty("patient");
-		description.addRequiredProperty("status");
+		description.addRequiredProperty(Appointment.FIELD_PATIENT);
+		description.addRequiredProperty(Appointment.FIELD_STATUS);
 		description.addProperty("reason");
 		description.addProperty("cancelReason");
-		description.addRequiredProperty("appointmentType");
+		description.addRequiredProperty(Appointment.FIELD_APPOINTMENT_TYPE);
 		return description;
 	}
 
@@ -96,7 +96,7 @@ public class AppointmentResource1_9 extends DataDelegatingCrudResource<Appointme
 		// note that time slot and appointment type are not updateable
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 		description.addProperty("visit");
-		description.addRequiredProperty("status");
+		description.addRequiredProperty(Appointment.FIELD_STATUS);
 		description.addProperty("reason");
 		description.addProperty("cancelReason");
 		return description;

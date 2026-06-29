@@ -23,7 +23,14 @@ import java.util.Set;
 public class AppointmentBlock extends BaseOpenmrsData {
 	
 	private static final long serialVersionUID = 1L;
-	
+
+	public static final String FIELD_START_DATE = "startDate";
+	public static final String FIELD_END_DATE = "endDate";
+	public static final String FIELD_PROVIDER = "provider";
+	public static final String FIELD_LOCATION = "location";
+	public static final String FIELD_TYPES = "types";
+	public static final String FIELD_VOIDED = "voided";
+
 	private Integer appointmentBlockId;
 	
 	private Date startDate;
