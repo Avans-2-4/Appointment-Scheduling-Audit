@@ -33,12 +33,12 @@ public class AppointmentBlockResource1_9 extends DataDelegatingCrudResource<Appo
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("display", findMethod("getDisplayString"));
-			description.addProperty("startDate");
-			description.addProperty("endDate");
-			description.addProperty("provider", Representation.DEFAULT);
-			description.addProperty("location", Representation.REF);
-			description.addProperty("types", Representation.REF);
-			description.addProperty("voided");
+			description.addProperty(AppointmentBlock.FIELD_START_DATE);
+			description.addProperty(AppointmentBlock.FIELD_END_DATE);
+			description.addProperty(AppointmentBlock.FIELD_PROVIDER, Representation.DEFAULT);
+			description.addProperty(AppointmentBlock.FIELD_LOCATION, Representation.REF);
+			description.addProperty(AppointmentBlock.FIELD_TYPES, Representation.REF);
+			description.addProperty(AppointmentBlock.FIELD_VOIDED);
 			description.addSelfLink();
 			description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
 			return description;
@@ -46,12 +46,12 @@ public class AppointmentBlockResource1_9 extends DataDelegatingCrudResource<Appo
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("display", findMethod("getDisplayString"));
-			description.addProperty("startDate");
-			description.addProperty("endDate");
-			description.addProperty("provider", Representation.FULL);
-			description.addProperty("location", Representation.FULL);
-			description.addProperty("types", Representation.FULL);
-			description.addProperty("voided");
+			description.addProperty(AppointmentBlock.FIELD_START_DATE);
+			description.addProperty(AppointmentBlock.FIELD_END_DATE);
+			description.addProperty(AppointmentBlock.FIELD_PROVIDER, Representation.FULL);
+			description.addProperty(AppointmentBlock.FIELD_LOCATION, Representation.FULL);
+			description.addProperty(AppointmentBlock.FIELD_TYPES, Representation.FULL);
+			description.addProperty(AppointmentBlock.FIELD_VOIDED);
 			description.addProperty("auditInfo", findMethod("getAuditInfo"));
 			description.addSelfLink();
 			return description;
@@ -62,11 +62,11 @@ public class AppointmentBlockResource1_9 extends DataDelegatingCrudResource<Appo
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addRequiredProperty("startDate");
-		description.addRequiredProperty("endDate");
-		description.addRequiredProperty("location");
-		description.addRequiredProperty("types");
-		description.addProperty("provider");
+		description.addRequiredProperty(AppointmentBlock.FIELD_START_DATE);
+		description.addRequiredProperty(AppointmentBlock.FIELD_END_DATE);
+		description.addRequiredProperty(AppointmentBlock.FIELD_LOCATION);
+		description.addRequiredProperty(AppointmentBlock.FIELD_TYPES);
+		description.addProperty(AppointmentBlock.FIELD_PROVIDER);
 		return description;
 	}
 

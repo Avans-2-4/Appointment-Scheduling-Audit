@@ -59,7 +59,7 @@ public class HibernateAppointmentDAO extends HibernateSingleClassDAO
 	public List<Appointment> getAppointmentsByPatient(Patient patient) {
 		return super.sessionFactory.getCurrentSession()
 				.createCriteria(Appointment.class)
-				.add(Restrictions.eq("patient", patient)).list();
+				.add(Restrictions.eq(Appointment.FIELD_PATIENT, patient)).list();
 	}
 
 	@Override
@@ -187,11 +187,11 @@ public class HibernateAppointmentDAO extends HibernateSingleClassDAO
 	public List<Appointment> getScheduledAppointmentsForPatient(Patient patient) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(
 				mappedClass);
-		criteria.add(Restrictions.eq("patient", patient));
-		criteria.add(Restrictions.or(Restrictions.eq("status", SCHEDULED),
-				Restrictions.eq("status", RESCHEDULED)));
-		criteria.add(Restrictions.eq("voided", false));
-		criteria.createAlias("timeSlot", "timeSlot");
+		criteria.add(Restrictions.eq(Appointment.FIELD_PATIENT, patient));
+		criteria.add(Restrictions.or(Restrictions.eq(Appointment.FIELD_STATUS, SCHEDULED),
+				Restrictions.eq(Appointment.FIELD_STATUS, RESCHEDULED)));
+		criteria.add(Restrictions.eq(Appointment.FIELD_VOIDED, false));
+		criteria.createAlias(Appointment.FIELD_TIME_SLOT, "timeSlot");
 		criteria.addOrder(Order.asc("timeSlot.startDate"));
 
 		return criteria.list();
@@ -203,13 +203,13 @@ public class HibernateAppointmentDAO extends HibernateSingleClassDAO
 			List<AppointmentType> appointmentTypes) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(
 				mappedClass);
-		criteria.createAlias("timeSlot", "time_slot");
+		criteria.createAlias(Appointment.FIELD_TIME_SLOT, "time_slot");
 		criteria.add(Restrictions.eq("time_slot.appointmentBlock",
 				appointmentBlock));
 
 		if (appointmentTypes != null)
-			criteria.add(Restrictions.in("appointmentType", appointmentTypes));
-		criteria.add(Restrictions.eq("voided", false));
+			criteria.add(Restrictions.in(Appointment.FIELD_APPOINTMENT_TYPE, appointmentTypes));
+		criteria.add(Restrictions.eq(Appointment.FIELD_VOIDED, false));
 
 		return criteria.list();
 	}
@@ -245,15 +245,15 @@ public class HibernateAppointmentDAO extends HibernateSingleClassDAO
 	private Criteria createAppointmentsInTimeSlotCriteria(TimeSlot timeSlot) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(
 				Appointment.class);
-		criteria.add(Restrictions.eq("timeSlot", timeSlot));
-		criteria.add(Restrictions.eq("voided", false));
+		criteria.add(Restrictions.eq(Appointment.FIELD_TIME_SLOT, timeSlot));
+		criteria.add(Restrictions.eq(Appointment.FIELD_VOIDED, false));
 		return criteria;
 	}
 
 	private Criteria createAppointmentsInTimeSlotByStatusCriteria(
 			TimeSlot timeSlot, List<AppointmentStatus> statuses) {
 		Criteria criteria = createAppointmentsInTimeSlotCriteria(timeSlot);
-		criteria.add(Restrictions.in("status", statuses));
+		criteria.add(Restrictions.in(Appointment.FIELD_STATUS, statuses));
 		return criteria;
 	}
 
