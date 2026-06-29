@@ -1003,79 +1003,41 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 		return appointmentDAO.getScheduledAppointmentsForPatient(patient);
 	}
 
+	private interface KeyExtractor<K> {
+		K extract(AppointmentStatusHistory history);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public Map<AppointmentType, Double> getAverageHistoryDurationByConditions(
 			Date fromDate, Date endDate, AppointmentStatus status) {
-		Map<AppointmentType, Double> averages = new HashMap<AppointmentType, Double>();
-		Map<AppointmentType, Integer> counters = new HashMap<AppointmentType, Integer>();
-
-		List<AppointmentStatusHistory> histories = appointmentStatusHistoryDAO
-				.getHistoriesByInterval(fromDate, endDate, status);
-
-		// Clean Not-Reasonable Durations
-		Map<AppointmentStatusHistory, Double> durations = new HashMap<AppointmentStatusHistory, Double>();
-		// 60 seconds * 1000 milliseconds in 1 minute
-		int minutesConversion = 60000;
-		int minutesInADay = 1440;
-		for (AppointmentStatusHistory history : histories) {
-			Date startDate = history.getStartDate();
-			Date toDate = history.getEndDate();
-			Double duration = (double) ((toDate.getTime() / minutesConversion) - (startDate
-					.getTime() / minutesConversion));
-
-			// Not reasonable to be more than a day
-			if (duration < minutesInADay)
-				durations.put(history, duration);
-		}
-
-		Double[] data = new Double[durations.size()];
-
-		int i = 0;
-		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations
-				.entrySet()) {
-			// Added Math.sqrt in order to lower the mean and variance
-			data[i] = Math.sqrt(entry.getValue());
-			i++;
-		}
-
-		// Compute Intervals
-		double[] boundaries = confidenceInterval(data);
-		//
-
-		// sum up the durations by type
-		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations
-				.entrySet()) {
-			AppointmentType type = entry.getKey().getAppointment()
-					.getAppointmentType();
-			Double duration = entry.getValue();
-
-			// Added Math.sqrt in order to lower the mean and variance
-			if ((Math.sqrt(duration) <= boundaries[1])) {
-				if (averages.containsKey(type)) {
-					averages.put(type, averages.get(type) + duration);
-					counters.put(type, counters.get(type) + 1);
-				} else {
-					averages.put(type, duration);
-					counters.put(type, 1);
-				}
-			}
-		}
-
-		// Compute average
-		for (Map.Entry<AppointmentType, Integer> counter : counters.entrySet())
-			averages.put(counter.getKey(), averages.get(counter.getKey())
-					/ counter.getValue());
-
-		return averages;
+		return computeAverageDurations(fromDate, endDate, status,
+				new KeyExtractor<AppointmentType>() {
+					@Override
+					public AppointmentType extract(AppointmentStatusHistory h) {
+						return h.getAppointment().getAppointmentType();
+					}
+				});
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Map<Provider, Double> getAverageHistoryDurationByConditionsPerProvider(
 			Date fromDate, Date endDate, AppointmentStatus status) {
-		Map<Provider, Double> averages = new HashMap<Provider, Double>();
-		Map<Provider, Integer> counters = new HashMap<Provider, Integer>();
+		return computeAverageDurations(fromDate, endDate, status,
+				new KeyExtractor<Provider>() {
+					@Override
+					public Provider extract(AppointmentStatusHistory h) {
+						return h.getAppointment().getTimeSlot().getAppointmentBlock().getProvider();
+					}
+				});
+	}
+
+	private <K> Map<K, Double> computeAverageDurations(
+			Date fromDate, Date endDate, AppointmentStatus status,
+			KeyExtractor<K> keyExtractor) {
+		Map<K, Double> averages = new HashMap<K, Double>();
+		Map<K, Integer> counters = new HashMap<K, Integer>();
 
 		List<AppointmentStatusHistory> histories = appointmentStatusHistoryDAO
 				.getHistoriesByInterval(fromDate, endDate, status);
@@ -1096,10 +1058,8 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 		}
 
 		Double[] data = new Double[durations.size()];
-
 		int i = 0;
-		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations
-				.entrySet()) {
+		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations.entrySet()) {
 			// Added Math.sqrt in order to lower the mean and variance
 			data[i] = Math.sqrt(entry.getValue());
 			i++;
@@ -1107,31 +1067,27 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 
 		// Compute Intervals
 		double[] boundaries = confidenceInterval(data);
-		//
 
-		// sum up the durations by type
-		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations
-				.entrySet()) {
-			Provider provider = entry.getKey().getAppointment().getTimeSlot()
-					.getAppointmentBlock().getProvider();
+		// sum up the durations by key
+		for (Map.Entry<AppointmentStatusHistory, Double> entry : durations.entrySet()) {
+			K key = keyExtractor.extract(entry.getKey());
 			Double duration = entry.getValue();
 
 			// Added Math.sqrt in order to lower the mean and variance
-			if ((Math.sqrt(duration) <= boundaries[1])) {
-				if (averages.containsKey(provider)) {
-					averages.put(provider, averages.get(provider) + duration);
-					counters.put(provider, counters.get(provider) + 1);
+			if (Math.sqrt(duration) <= boundaries[1]) {
+				if (averages.containsKey(key)) {
+					averages.put(key, averages.get(key) + duration);
+					counters.put(key, counters.get(key) + 1);
 				} else {
-					averages.put(provider, duration);
-					counters.put(provider, 1);
+					averages.put(key, duration);
+					counters.put(key, 1);
 				}
 			}
 		}
 
 		// Compute average
-		for (Map.Entry<Provider, Integer> counter : counters.entrySet())
-			averages.put(counter.getKey(), averages.get(counter.getKey())
-					/ counter.getValue());
+		for (Map.Entry<K, Integer> counter : counters.entrySet())
+			averages.put(counter.getKey(), averages.get(counter.getKey()) / counter.getValue());
 
 		return averages;
 	}
