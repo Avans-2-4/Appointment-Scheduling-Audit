@@ -35,6 +35,12 @@ public class Appointment extends BaseOpenmrsData implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String FIELD_PATIENT = "patient";
+	public static final String FIELD_TIME_SLOT = "timeSlot";
+	public static final String FIELD_STATUS = "status";
+	public static final String FIELD_VOIDED = "voided";
+	public static final String FIELD_APPOINTMENT_TYPE = "appointmentType";
+
 	public enum AppointmentStatusType {
 		SCHEDULED, ACTIVE, CANCELLED, MISSED, COMPLETED
 	}
