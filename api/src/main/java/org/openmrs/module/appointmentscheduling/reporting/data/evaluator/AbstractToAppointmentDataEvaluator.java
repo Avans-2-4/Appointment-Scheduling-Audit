@@ -19,6 +19,8 @@ import java.util.Set;
 
 public abstract class AbstractToAppointmentDataEvaluator implements AppointmentDataEvaluator {
 
+    private static final String HQL_APPOINTMENT_ID = "a.appointmentId";
+
     @Autowired
     protected EvaluationService evaluationService;
 
@@ -28,38 +30,38 @@ public abstract class AbstractToAppointmentDataEvaluator implements AppointmentD
         EvaluatedAppointmentData result = new EvaluatedAppointmentData(definition, context);
 
         HqlQueryBuilder q = new HqlQueryBuilder();
-        q.select("a.appointmentId", "a.patient.patientId");
+        q.select(HQL_APPOINTMENT_ID, "a.patient.patientId");
         q.from(Appointment.class, "a");
         if (context != null) {
             Set<Integer> appointmentIds = AppointmentDataUtil.getAppointmentIdsForContext(context, true);
-            q.whereIn("a.appointmentId", appointmentIds);
+            q.whereIn(HQL_APPOINTMENT_ID, appointmentIds);
         }
         Map<Integer, Integer> convertedIds = evaluationService.evaluateToMap(q, Integer.class, Integer.class, context);
 
         if (!Context.hasPrivilege(AppointmentSchedulingConstants.PRIVILEGE_VIEW_CONFIDENTIAL_APPOINTMENT_DETAILS)) {
             HqlQueryBuilder confidentialQuery = new HqlQueryBuilder();
-            confidentialQuery.select("a.appointmentId", "case a.appointmentType.confidential when 0 then false else true end");
+            confidentialQuery.select(HQL_APPOINTMENT_ID, "case a.appointmentType.confidential when 0 then false else true end");
             confidentialQuery.from(Appointment.class, "a");
             if (context != null) {
                 Set<Integer> appointmentIds = AppointmentDataUtil.getAppointmentIdsForContext(context, true);
-                confidentialQuery.whereIn("a.appointmentId", appointmentIds);
+                confidentialQuery.whereIn(HQL_APPOINTMENT_ID, appointmentIds);
             }
             Map<Integer, Boolean> confidentialMap = evaluationService.evaluateToMap(confidentialQuery, Integer.class, Boolean.class, context);
             for (Iterator<Map.Entry<Integer, Integer>> iterator = convertedIds.entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<Integer, Integer> entry = iterator.next();
-                if (confidentialMap.get(entry.getKey())) {
+                if (Boolean.TRUE.equals(confidentialMap.get(entry.getKey()))) {
                     iterator.remove();
                 }
             }
         }
 
         if (!convertedIds.isEmpty()) {
-            evaluateJoinedData(definition, convertedIds, context, result);
+            evaluateJoinedData(definition, convertedIds, result);
         }
 
         return result;
     }
 
     protected abstract void evaluateJoinedData(AppointmentDataDefinition definition, Map<Integer, Integer> convertedIds,
-                                               EvaluationContext context, EvaluatedAppointmentData result) throws EvaluationException;
+                                               EvaluatedAppointmentData result) throws EvaluationException;
 }
