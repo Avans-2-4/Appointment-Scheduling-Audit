@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- visit 4: starts exactly when time_slot 6 ends (2005-01-02 01:00:00) -->
+    <visit visit_id="4" patient_id="2" date_started="2005-01-02 01:00:00.0" uuid="44444444-8e59-401d-8a4a-976a0b183600" date_created="2005-01-02 01:00:00.0" voided="false" creator="1" />
+    <!-- appointment 15: COMPLETED, slot 6, linked to on-time visit 4 -->
+    <appointmentscheduling_appointment appointment_id="15" time_slot_id="6" appointment_type_id="3" visit_id="4" patient_id="2" status="COMPLETED" uuid="15151515-8e59-401d-8a4a-976a0b183605" date_created="2005-01-01 00:00:00.0" voided="false" creator="1"/>
+</dataset>
