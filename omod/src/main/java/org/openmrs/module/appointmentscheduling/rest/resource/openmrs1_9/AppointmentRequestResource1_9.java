@@ -33,14 +33,7 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
             description.addProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE, Representation.REF);
             description.addProperty(AppointmentRequest.FIELD_PROVIDER, Representation.DEFAULT);
             description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY, Representation.DEFAULT);
-            description.addProperty(AppointmentRequest.FIELD_REQUESTED_ON);
-            description.addProperty(AppointmentRequest.FIELD_STATUS);
-            description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_VALUE);
-            description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_UNITS);
-            description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_VALUE);
-            description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_UNITS);
-            description.addProperty(AppointmentRequest.FIELD_NOTES);
-            description.addProperty("voided");
+            addSharedProperties(description);
             description.addSelfLink();
             description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
             return description;
@@ -52,14 +45,7 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
             description.addProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE, Representation.FULL);
             description.addProperty(AppointmentRequest.FIELD_PROVIDER, Representation.FULL);
             description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY, Representation.FULL);
-            description.addProperty(AppointmentRequest.FIELD_REQUESTED_ON);
-            description.addProperty(AppointmentRequest.FIELD_STATUS);
-            description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_VALUE);
-            description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_UNITS);
-            description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_VALUE);
-            description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_UNITS);
-            description.addProperty(AppointmentRequest.FIELD_NOTES);
-            description.addProperty("voided");
+            addSharedProperties(description);
             description.addProperty("auditInfo", findMethod("getAuditInfo"));
             description.addSelfLink();
             return description;
@@ -70,6 +56,15 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
 
     @Override
     public DelegatingResourceDescription getCreatableProperties() {
+        return buildWriteDescription();
+    }
+
+    @Override
+    public DelegatingResourceDescription getUpdatableProperties() {
+        return buildWriteDescription();
+    }
+
+    private DelegatingResourceDescription buildWriteDescription() {
         DelegatingResourceDescription description = new DelegatingResourceDescription();
         description.addRequiredProperty(AppointmentRequest.FIELD_PATIENT);
         description.addRequiredProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE);
@@ -85,21 +80,15 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
         return description;
     }
 
-    @Override
-    public DelegatingResourceDescription getUpdatableProperties() {
-        DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addRequiredProperty(AppointmentRequest.FIELD_PATIENT);
-        description.addRequiredProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE);
-        description.addProperty(AppointmentRequest.FIELD_PROVIDER);
-        description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY);
-        description.addRequiredProperty(AppointmentRequest.FIELD_REQUESTED_ON);
-        description.addRequiredProperty(AppointmentRequest.FIELD_STATUS);
+    private void addSharedProperties(DelegatingResourceDescription description) {
+        description.addProperty(AppointmentRequest.FIELD_REQUESTED_ON);
+        description.addProperty(AppointmentRequest.FIELD_STATUS);
         description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_VALUE);
         description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_UNITS);
         description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_VALUE);
         description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_UNITS);
         description.addProperty(AppointmentRequest.FIELD_NOTES);
-        return description;
+        description.addProperty("voided");
     }
 
     @Override
