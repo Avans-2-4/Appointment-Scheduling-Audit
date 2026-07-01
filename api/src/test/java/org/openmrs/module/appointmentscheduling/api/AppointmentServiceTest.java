@@ -54,6 +54,12 @@ public class AppointmentServiceTest extends BaseModuleContextSensitiveTest {
 
 	private static int TOTAL_APPOINTMENTS_EXCLUDING_VOIDED = 12;
 
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
+
+	private static final String EARLY_LATE_FROM_DATE = "2005-01-01";
+
+	private static final String EARLY_LATE_TO_DATE = "2006-02-02";
+
 	@Before
 	public void before() throws Exception {
 		service = Context.getService(AppointmentService.class);
@@ -663,5 +669,67 @@ public class AppointmentServiceTest extends BaseModuleContextSensitiveTest {
 				.getLateAppointments(fromDate, toDate, null, null, null);
 		assertEquals(1, appointments.size());
 
+	}
+
+	@Test
+	@Verifies(value = "should return empty list when no completed appointments exist in date range",
+			method = "getEarlyAppointments(Date fromDate,Date toDate, Location location, Provider provider, AppointmentType appointmentType)")
+	public void getEarlyAppointments_shouldReturnEmptyListWhenNoAppointmentsInRange() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		Date fromDate = format.parse("2000-01-01");
+		Date toDate = format.parse("2001-01-01");
+		List<Appointment> appointments = service.getEarlyAppointments(fromDate, toDate, null, null, null);
+		assertEquals(0, appointments.size());
+	}
+
+	@Test
+	@Verifies(value = "should return empty list when no completed appointments exist in date range",
+			method = "getLateAppointments(Date fromDate,Date toDate, Location location, Provider provider, AppointmentType appointmentType)")
+	public void getLateAppointments_shouldReturnEmptyListWhenNoAppointmentsInRange() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		Date fromDate = format.parse("2000-01-01");
+		Date toDate = format.parse("2001-01-01");
+		List<Appointment> appointments = service.getLateAppointments(fromDate, toDate, null, null, null);
+		assertEquals(0, appointments.size());
+	}
+
+	@Test
+	@Verifies(value = "should return empty list when appointment type filter excludes all completed appointments",
+			method = "getEarlyAppointments(Date fromDate,Date toDate, Location location, Provider provider, AppointmentType appointmentType)")
+	public void getEarlyAppointments_shouldReturnEmptyListWhenTypeFilterExcludesAll() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		Date fromDate = format.parse(EARLY_LATE_FROM_DATE);
+		Date toDate = format.parse(EARLY_LATE_TO_DATE);
+		AppointmentType typeWithNoCompleted = service.getAppointmentType(1);
+		List<Appointment> appointments = service.getEarlyAppointments(fromDate, toDate, null, null, typeWithNoCompleted);
+		assertEquals(0, appointments.size());
+	}
+
+	@Test
+	@Verifies(value = "should return empty list when appointment type filter excludes all completed appointments",
+			method = "getLateAppointments(Date fromDate,Date toDate, Location location, Provider provider, AppointmentType appointmentType)")
+	public void getLateAppointments_shouldReturnEmptyListWhenTypeFilterExcludesAll() throws Exception {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		Date fromDate = format.parse(EARLY_LATE_FROM_DATE);
+		Date toDate = format.parse(EARLY_LATE_TO_DATE);
+		AppointmentType typeWithNoCompleted = service.getAppointmentType(1);
+		List<Appointment> appointments = service.getLateAppointments(fromDate, toDate, null, null, typeWithNoCompleted);
+		assertEquals(0, appointments.size());
+	}
+
+	@Test
+	@Verifies(value = "should exclude appointment whose visit starts exactly at slot end from both early and late lists",
+			method = "getEarlyAppointments(Date fromDate,Date toDate, Location location, Provider provider, AppointmentType appointmentType)")
+	public void getEarlyAndLateAppointments_shouldExcludeOnTimeAppointment() throws Exception {
+		executeDataSet("earlyLateBoundaryTestDataset.xml");
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		Date fromDate = format.parse(EARLY_LATE_FROM_DATE);
+		Date toDate = format.parse(EARLY_LATE_TO_DATE);
+		// appointment 15 has visit.startDatetime == timeSlot.endDate (on-time):
+		// it must not appear in either list, so counts stay at 1 for each
+		List<Appointment> earlyAppointments = service.getEarlyAppointments(fromDate, toDate, null, null, null);
+		List<Appointment> lateAppointments = service.getLateAppointments(fromDate, toDate, null, null, null);
+		assertEquals(1, earlyAppointments.size());
+		assertEquals(1, lateAppointments.size());
 	}
 }

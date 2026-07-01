@@ -1266,9 +1266,9 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 		);
 	}
 
-	@Override
-	public List<Appointment> getEarlyAppointments(Date fromDate, Date toDate, Location location,
-												  Provider provider, AppointmentType appointmentType) throws APIException {
+	public List<Appointment> getAppointmentsByTiming(Date fromDate, Date toDate, Location location,
+													  Provider provider, AppointmentType appointmentType,
+													  AppointmentTimingPredicate predicate) throws APIException {
 		List<AppointmentStatus> statuses = new ArrayList<AppointmentStatus>();
 		statuses.add(AppointmentStatus.COMPLETED);
 		statuses.add(AppointmentStatus.INCONSULTATION);
@@ -1276,33 +1276,25 @@ public class AppointmentServiceImpl extends BaseOpenmrsService implements Appoin
 		List<Appointment> allCompletedAppointments = getAppointmentsByConstraints(fromDate,
 				toDate, location, provider, appointmentType, null, statuses);
 
-		List<Appointment> earlyAppointments = new ArrayList<Appointment>();
+		List<Appointment> result = new ArrayList<Appointment>();
 		for (Appointment ap : allCompletedAppointments) {
-			if (ap.getVisit().getStartDatetime().before(ap.getTimeSlot().getEndDate())) {
-				earlyAppointments.add(ap);
+			if (predicate.test(ap)) {
+				result.add(ap);
 			}
 		}
-		return earlyAppointments;
+		return result;
+	}
+
+	@Override
+	public List<Appointment> getEarlyAppointments(Date fromDate, Date toDate, Location location,
+												  Provider provider, AppointmentType appointmentType) throws APIException {
+		return getAppointmentsByTiming(fromDate, toDate, location, provider, appointmentType, new EarlyArrivalPredicate());
 	}
 
 	@Override
 	public List<Appointment> getLateAppointments(Date fromDate, Date toDate, Location location,
 												 Provider provider, AppointmentType appointmentType) throws APIException {
-		List<AppointmentStatus> statuses = new ArrayList<AppointmentStatus>();
-		statuses.add(AppointmentStatus.COMPLETED);
-		statuses.add(AppointmentStatus.INCONSULTATION);
-
-		List<Appointment> allCompletedAppointments = getAppointmentsByConstraints(fromDate,
-				toDate, location, provider, appointmentType, null, statuses);
-
-		List<Appointment> lateAppointments = new ArrayList<Appointment>();
-		for (Appointment ap : allCompletedAppointments) {
-			if (ap.getVisit().getStartDatetime().after(ap.getTimeSlot().getEndDate())) {
-				lateAppointments.add(ap);
-			}
-		}
-
-		return lateAppointments;
+		return getAppointmentsByTiming(fromDate, toDate, location, provider, appointmentType, new LateArrivalPredicate());
 	}
 
 	@Override
