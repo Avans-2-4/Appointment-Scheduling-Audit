@@ -1,6 +1,5 @@
 package org.openmrs.module.appointmentscheduling.reporting.data.evaluator;
 
-import org.openmrs.Cohort;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.appointmentscheduling.Appointment;
 import org.openmrs.module.appointmentscheduling.AppointmentSchedulingConstants;
