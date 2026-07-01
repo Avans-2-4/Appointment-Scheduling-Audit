@@ -17,6 +17,8 @@ import java.util.List;
 public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
         implements ProviderScheduleDAO {
 
+    private static final String TIME_FORMAT = TIME_FORMAT;
+
     /**
      * You must call this before using any of the data access methods, since it's not actually
      * possible to write them all with compile-time class information.
@@ -39,7 +41,7 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
             if (provider != null)
                 stringQuery += " AND providerSchedule.provider=:provider";
             if (appointmentDate != null) {
-                if (!new SimpleDateFormat("HH:mm:ss").format(appointmentDate).equals("00:00:00")) {
+                if (!new SimpleDateFormat(TIME_FORMAT).format(appointmentDate).equals("00:00:00")) {
                     stringQuery += " AND :appointmentTime >= providerSchedule.startTime AND :appointmentTime <= providerSchedule.endTime";
                 }
             }
@@ -51,7 +53,7 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
             if (provider != null)
                 query.setParameter("provider", provider);
             if (appointmentDate != null) {
-                if (!new SimpleDateFormat("HH:mm:ss").format(appointmentDate).equals("00:00:00")) {
+                if (!new SimpleDateFormat(TIME_FORMAT).format(appointmentDate).equals("00:00:00")) {
                     query.setParameter("appointmentTime", getTimeFromDate(appointmentDate));
                 }
             }
@@ -65,8 +67,8 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
 
     private Time getTimeFromDate(Date date) {
         try {
-            return new Time(new SimpleDateFormat("HH:mm:ss")
-                    .parse(new SimpleDateFormat("HH:mm:ss").format(date)).getTime());
+            return new Time(new SimpleDateFormat(TIME_FORMAT)
+                    .parse(new SimpleDateFormat(TIME_FORMAT).format(date)).getTime());
         } catch (ParseException e) {
             // e.printStackTrace(); // disabled bc of possible logging of medical data, and a possible extra attack vector.
             return null;
