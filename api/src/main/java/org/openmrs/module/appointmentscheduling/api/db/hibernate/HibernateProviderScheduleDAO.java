@@ -36,8 +36,7 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
         if (location != null) {
 			String stringQuery = "SELECT providerSchedule FROM ProviderSchedule AS providerSchedule WHERE providerSchedule.voided = false";
 
-            if (location != null)
-                stringQuery += " AND providerSchedule.location=:location";
+            stringQuery += " AND providerSchedule.location=:location";
             if (provider != null)
                 stringQuery += " AND providerSchedule.provider=:provider";
             if (isSpecificTime(appointmentDate)) {
@@ -46,8 +45,7 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
             Query query = super.sessionFactory.getCurrentSession().createQuery(
                     stringQuery);
 
-            if (location != null)
-                query.setParameter("location", location);
+            query.setParameter("location", location);
             if (provider != null)
                 query.setParameter("provider", provider);
             if (isSpecificTime(appointmentDate)) {
