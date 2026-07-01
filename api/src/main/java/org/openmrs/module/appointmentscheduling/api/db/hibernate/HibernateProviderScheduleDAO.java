@@ -40,10 +40,8 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
                 stringQuery += " AND providerSchedule.location=:location";
             if (provider != null)
                 stringQuery += " AND providerSchedule.provider=:provider";
-            if (appointmentDate != null) {
-                if (!new SimpleDateFormat(TIME_FORMAT).format(appointmentDate).equals("00:00:00")) {
-                    stringQuery += " AND :appointmentTime >= providerSchedule.startTime AND :appointmentTime <= providerSchedule.endTime";
-                }
+            if (isSpecificTime(appointmentDate)) {
+                stringQuery += " AND :appointmentTime >= providerSchedule.startTime AND :appointmentTime <= providerSchedule.endTime";
             }
             Query query = super.sessionFactory.getCurrentSession().createQuery(
                     stringQuery);
@@ -52,10 +50,8 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
                 query.setParameter("location", location);
             if (provider != null)
                 query.setParameter("provider", provider);
-            if (appointmentDate != null) {
-                if (!new SimpleDateFormat(TIME_FORMAT).format(appointmentDate).equals("00:00:00")) {
-                    query.setParameter("appointmentTime", getTimeFromDate(appointmentDate));
-                }
+            if (isSpecificTime(appointmentDate)) {
+                query.setParameter("appointmentTime", getTimeFromDate(appointmentDate));
             }
 
             return (List<ProviderSchedule>) query.list();
@@ -63,6 +59,10 @@ public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
         } else {
             throw new DAOException("location must have a value");
         }
+    }
+
+    private boolean isSpecificTime(Date date) {
+        return date != null && !new SimpleDateFormat(TIME_FORMAT).format(date).equals("00:00:00");
     }
 
     private Time getTimeFromDate(Date date) {
