@@ -56,6 +56,19 @@ public class PatientToAppointmentDataEvaluatorTest extends BaseModuleContextSens
     }
 
     @Test
+    @DirtiesContext
+    public void evaluate_shouldReturnEmptySetIfAllAppointmentsAreConfidential() throws Exception {
+        Context.becomeUser("butch");
+
+        PatientToAppointmentDataDefinition d = new PatientToAppointmentDataDefinition(new PatientIdDataDefinition());
+        AppointmentEvaluationContext context = new AppointmentEvaluationContext();
+        context.setBaseAppointments(new AppointmentIdSet(1, 2)); // appointments 1 and 2 are both type 1 (confidential)
+        EvaluatedAppointmentData ad = appointmentDataService.evaluate(d, context);
+
+        assertThat(ad.getData().size(), is(0));
+    }
+
+    @Test
     public void evaluate_shouldReturnEmptySetIfInputSetEmpty() throws Exception {
 
         PatientIdentifierType pit = Context.getPatientService().getPatientIdentifierType(2);

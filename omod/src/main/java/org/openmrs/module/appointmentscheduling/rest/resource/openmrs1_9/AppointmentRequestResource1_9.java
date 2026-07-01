@@ -29,18 +29,11 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
             DelegatingResourceDescription description = new DelegatingResourceDescription();
             description.addProperty("uuid");
             description.addProperty("display", findMethod("getDisplayString"));
-            description.addProperty("patient", Representation.DEFAULT);
-            description.addProperty("appointmentType", Representation.REF);
-            description.addProperty("provider", Representation.DEFAULT);
-            description.addProperty("requestedBy", Representation.DEFAULT);
-            description.addProperty("requestedOn");
-            description.addProperty("status");
-            description.addProperty("minTimeFrameValue");
-            description.addProperty("minTimeFrameUnits");
-            description.addProperty("maxTimeFrameValue");
-            description.addProperty("maxTimeFrameUnits");
-            description.addProperty("notes");
-            description.addProperty("voided");
+            description.addProperty(AppointmentRequest.FIELD_PATIENT, Representation.DEFAULT);
+            description.addProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE, Representation.REF);
+            description.addProperty(AppointmentRequest.FIELD_PROVIDER, Representation.DEFAULT);
+            description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY, Representation.DEFAULT);
+            addSharedProperties(description);
             description.addSelfLink();
             description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
             return description;
@@ -48,18 +41,11 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
             DelegatingResourceDescription description = new DelegatingResourceDescription();
             description.addProperty("uuid");
             description.addProperty("display", findMethod("getDisplayString"));
-            description.addProperty("patient", Representation.FULL);
-            description.addProperty("appointmentType", Representation.FULL);
-            description.addProperty("provider", Representation.FULL);
-            description.addProperty("requestedBy", Representation.FULL);
-            description.addProperty("requestedOn");
-            description.addProperty("status");
-            description.addProperty("minTimeFrameValue");
-            description.addProperty("minTimeFrameUnits");
-            description.addProperty("maxTimeFrameValue");
-            description.addProperty("maxTimeFrameUnits");
-            description.addProperty("notes");
-            description.addProperty("voided");
+            description.addProperty(AppointmentRequest.FIELD_PATIENT, Representation.FULL);
+            description.addProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE, Representation.FULL);
+            description.addProperty(AppointmentRequest.FIELD_PROVIDER, Representation.FULL);
+            description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY, Representation.FULL);
+            addSharedProperties(description);
             description.addProperty("auditInfo", findMethod("getAuditInfo"));
             description.addSelfLink();
             return description;
@@ -70,36 +56,39 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
 
     @Override
     public DelegatingResourceDescription getCreatableProperties() {
-        DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addRequiredProperty("patient");
-        description.addRequiredProperty("appointmentType");
-        description.addProperty("provider");
-        description.addProperty("requestedBy");
-        description.addRequiredProperty("requestedOn");
-        description.addRequiredProperty("status");
-        description.addProperty("minTimeFrameValue");
-        description.addProperty("minTimeFrameUnits");
-        description.addProperty("maxTimeFrameValue");
-        description.addProperty("maxTimeFrameUnits");
-        description.addProperty("notes");
-        return description;
+        return buildWriteDescription();
     }
 
     @Override
     public DelegatingResourceDescription getUpdatableProperties() {
+        return buildWriteDescription();
+    }
+
+    private DelegatingResourceDescription buildWriteDescription() {
         DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addRequiredProperty("patient");
-        description.addRequiredProperty("appointmentType");
-        description.addProperty("provider");
-        description.addProperty("requestedBy");
-        description.addRequiredProperty("requestedOn");
-        description.addRequiredProperty("status");
-        description.addProperty("minTimeFrameValue");
-        description.addProperty("minTimeFrameUnits");
-        description.addProperty("maxTimeFrameValue");
-        description.addProperty("maxTimeFrameUnits");
-        description.addProperty("notes");
+        description.addRequiredProperty(AppointmentRequest.FIELD_PATIENT);
+        description.addRequiredProperty(AppointmentRequest.FIELD_APPOINTMENT_TYPE);
+        description.addProperty(AppointmentRequest.FIELD_PROVIDER);
+        description.addProperty(AppointmentRequest.FIELD_REQUESTED_BY);
+        description.addRequiredProperty(AppointmentRequest.FIELD_REQUESTED_ON);
+        description.addRequiredProperty(AppointmentRequest.FIELD_STATUS);
+        description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_VALUE);
+        description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_UNITS);
+        description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_VALUE);
+        description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_UNITS);
+        description.addProperty(AppointmentRequest.FIELD_NOTES);
         return description;
+    }
+
+    private void addSharedProperties(DelegatingResourceDescription description) {
+        description.addProperty(AppointmentRequest.FIELD_REQUESTED_ON);
+        description.addProperty(AppointmentRequest.FIELD_STATUS);
+        description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_VALUE);
+        description.addProperty(AppointmentRequest.FIELD_MIN_TIME_FRAME_UNITS);
+        description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_VALUE);
+        description.addProperty(AppointmentRequest.FIELD_MAX_TIME_FRAME_UNITS);
+        description.addProperty(AppointmentRequest.FIELD_NOTES);
+        description.addProperty("voided");
     }
 
     @Override
@@ -136,17 +125,17 @@ public class AppointmentRequestResource1_9 extends DataDelegatingCrudResource<Ap
     @Override
     protected PageableResult doSearch(RequestContext context) {
 
-        AppointmentType appointmentType = context.getParameter("appointmentType") != null ? Context.getService(
-                AppointmentService.class).getAppointmentTypeByUuid(context.getParameter("appointmentType")) : null;
+        AppointmentType appointmentType = context.getParameter(AppointmentRequest.FIELD_APPOINTMENT_TYPE) != null ? Context.getService(
+                AppointmentService.class).getAppointmentTypeByUuid(context.getParameter(AppointmentRequest.FIELD_APPOINTMENT_TYPE)) : null;
 
-        Provider provider = context.getParameter("provider") != null ? Context.getProviderService().getProviderByUuid(
-                context.getParameter("provider")) : null;
+        Provider provider = context.getParameter(AppointmentRequest.FIELD_PROVIDER) != null ? Context.getProviderService().getProviderByUuid(
+                context.getParameter(AppointmentRequest.FIELD_PROVIDER)) : null;
 
-        Patient patient = context.getParameter("patient") != null ? Context.getPatientService().getPatientByUuid(
-                context.getParameter("patient")) : null;
+        Patient patient = context.getParameter(AppointmentRequest.FIELD_PATIENT) != null ? Context.getPatientService().getPatientByUuid(
+                context.getParameter(AppointmentRequest.FIELD_PATIENT)) : null;
 
-        AppointmentRequest.AppointmentRequestStatus status =  context.getParameter("status") != null  ?
-                AppointmentRequest.AppointmentRequestStatus.valueOf(context.getParameter("status").toUpperCase())
+        AppointmentRequest.AppointmentRequestStatus status =  context.getParameter(AppointmentRequest.FIELD_STATUS) != null  ?
+                AppointmentRequest.AppointmentRequestStatus.valueOf(context.getParameter(AppointmentRequest.FIELD_STATUS).toUpperCase())
                 : null;
 
         return new NeedsPaging<AppointmentRequest>(Context.getService(AppointmentService.class).getAppointmentRequestsByConstraints(

@@ -12,6 +12,18 @@ import java.util.Date;
  */
 public class AppointmentRequest extends BaseOpenmrsData {
 
+    public static final String FIELD_PATIENT = "patient";
+    public static final String FIELD_APPOINTMENT_TYPE = "appointmentType";
+    public static final String FIELD_PROVIDER = "provider";
+    public static final String FIELD_STATUS = "status";
+    public static final String FIELD_NOTES = "notes";
+    public static final String FIELD_REQUESTED_BY = "requestedBy";
+    public static final String FIELD_REQUESTED_ON = "requestedOn";
+    public static final String FIELD_MIN_TIME_FRAME_VALUE = "minTimeFrameValue";
+    public static final String FIELD_MIN_TIME_FRAME_UNITS = "minTimeFrameUnits";
+    public static final String FIELD_MAX_TIME_FRAME_VALUE = "maxTimeFrameValue";
+    public static final String FIELD_MAX_TIME_FRAME_UNITS = "maxTimeFrameUnits";
+
     public enum AppointmentRequestStatus { PENDING, FULFILLED, CANCELLED };
 
     private Integer appointmentRequestId;

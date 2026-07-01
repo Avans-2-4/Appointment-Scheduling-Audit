@@ -54,8 +54,20 @@ public class PersonToAppointmentDataEvaluatorTest extends BaseModuleContextSensi
         Assert.assertEquals(1, ed.getData().size());
         BirthdateConverter c = new BirthdateConverter("yyyy-MM-dd");
         Assert.assertEquals("1948-01-01", c.convert(ed.getData().get(4)));
-//        Assert.assertEquals("1975-04-08", c.convert(ed.getData().get(2)));
+    }
 
+    @Test
+    @DirtiesContext
+    public void evaluate_shouldReturnEmptySetIfAllAppointmentsAreConfidential() throws Exception {
+        Context.becomeUser("butch");
+
+        PersonToAppointmentDataDefinition d = new PersonToAppointmentDataDefinition(new BirthdateDataDefinition());
+
+        AppointmentEvaluationContext context = new AppointmentEvaluationContext();
+        context.setBaseAppointments(new AppointmentIdSet(1, 2)); // appointments 1 and 2 are both type 1 (confidential)
+        EvaluatedAppointmentData ed = Context.getService(AppointmentDataService.class).evaluate(d, context);
+
+        Assert.assertEquals(0, ed.getData().size());
     }
 
     @Test
