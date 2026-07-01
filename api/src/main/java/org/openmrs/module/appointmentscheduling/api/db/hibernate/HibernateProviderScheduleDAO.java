@@ -17,7 +17,7 @@ import java.util.List;
 public class HibernateProviderScheduleDAO extends HibernateSingleClassDAO
         implements ProviderScheduleDAO {
 
-    private static final String TIME_FORMAT = TIME_FORMAT;
+    private static final String TIME_FORMAT = "HH:mm:ss";
 
     /**
      * You must call this before using any of the data access methods, since it's not actually
