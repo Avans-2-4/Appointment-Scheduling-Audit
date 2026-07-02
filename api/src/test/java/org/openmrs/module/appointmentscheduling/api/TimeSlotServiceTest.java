@@ -468,4 +468,44 @@ public class TimeSlotServiceTest extends BaseModuleContextSensitiveTest {
 		assertNotNull(timeSlot);
 		assertEquals(TOTAL_TIME_SLOTS + 1, timeSlots.size());
 	}
+
+	@Test(expected = APIException.class)
+	@Verifies(value = "should throw when the appointment time falls outside the provider schedule's time window", method = "createTimeSlotUsingProviderSchedule(Date, Provider, Location)")
+	public void createTimeSlotUsingProviderSchedule_shouldThrowWhenAppointmentTimeOutsideScheduleWindow() throws ParseException {
+
+		// all provider schedules for provider 1 / location 2 run from 07:00:00 to 18:00:00
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		Date appointmentDate = format.parse("2020-01-02 23:00:00.0");
+
+		Provider provider = Context.getProviderService().getProvider(1);
+		assertNotNull(provider);
+
+		Location location = Context.getLocationService().getLocation(2);
+		assertNotNull(location);
+
+		service.createTimeSlotUsingProviderSchedule(appointmentDate, provider, location);
+	}
+
+	@Test
+	@Verifies(value = "should ignore the time-of-day filter when the appointment time is exactly midnight", method = "createTimeSlotUsingProviderSchedule(Date, Provider, Location)")
+	public void createTimeSlotUsingProviderSchedule_shouldIgnoreTimeFilterWhenAppointmentTimeIsMidnight() throws ParseException {
+
+		// midnight (00:00:00) falls outside the 07:00:00-18:00:00 provider schedule window too,
+		// but HibernateProviderScheduleDAO.isSpecificTime() treats midnight as "no specific time",
+		// so the schedule should still match on location/provider alone.
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		Date appointmentDate = format.parse("2020-01-02 00:00:00.0");
+
+		Provider provider = Context.getProviderService().getProvider(1);
+		assertNotNull(provider);
+
+		Location location = Context.getLocationService().getLocation(2);
+		assertNotNull(location);
+
+		TimeSlot timeSlot = service.createTimeSlotUsingProviderSchedule(appointmentDate, provider, location);
+		List<TimeSlot> timeSlots = service.getAllTimeSlots();
+
+		assertNotNull(timeSlot);
+		assertEquals(TOTAL_TIME_SLOTS + 1, timeSlots.size());
+	}
 }
