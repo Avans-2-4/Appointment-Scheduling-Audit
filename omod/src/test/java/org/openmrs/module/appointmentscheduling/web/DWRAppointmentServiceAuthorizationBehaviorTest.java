@@ -44,6 +44,7 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	public void getPatientDescription_shouldNotRejectUserWithViewAppointmentsPrivilege() {
 		grantOnly(AppointmentUtils.PRIV_VIEW_APPOINTMENTS);
 		assertPrivilegeGateOpen(new Probe() {
+			@Override
 			public void run() {
 				dwrService.getPatientDescription(2);
 			}
@@ -60,6 +61,7 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	public void getAppointmentBlocksForCalendar_shouldNotRejectUserWithViewAppointmentBlocksPrivilege() {
 		grantOnly(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS);
 		assertPrivilegeGateOpen(new Probe() {
+			@Override
 			public void run() throws Exception {
 				dwrService.getAppointmentBlocksForCalendar(0L, 0L, null, null, null);
 			}
@@ -76,6 +78,7 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	public void getAppointmentBlocks_shouldNotRejectUserWithViewAppointmentBlocksPrivilege() {
 		grantOnly(AppointmentUtils.PRIV_VIEW_APPOINTMENT_BLOCKS);
 		assertPrivilegeGateOpen(new Probe() {
+			@Override
 			public void run() throws Exception {
 				dwrService.getAppointmentBlocks("", "", null, null, null);
 			}
@@ -92,6 +95,7 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	public void getAverageWaitingTimeByType_shouldNotRejectUserWithViewAppointmentsStatisticsPrivilege() {
 		grantOnly(AppointmentUtils.PRIV_VIEW_APPOINTMENTS_STATISTICS);
 		assertPrivilegeGateOpen(new Probe() {
+			@Override
 			public void run() throws Exception {
 				dwrService.getAverageWaitingTimeByType(RANGE_START, RANGE_END);
 			}
@@ -108,6 +112,7 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	public void getAverageConsultationTimeByType_shouldNotRejectUserWithViewAppointmentsStatisticsPrivilege() {
 		grantOnly(AppointmentUtils.PRIV_VIEW_APPOINTMENTS_STATISTICS);
 		assertPrivilegeGateOpen(new Probe() {
+			@Override
 			public void run() throws Exception {
 				dwrService.getAverageConsultationTimeByType(RANGE_START, RANGE_END);
 			}
@@ -130,7 +135,10 @@ public class DWRAppointmentServiceAuthorizationBehaviorTest {
 	/**
 	 * Runs the probe and fails only if the privilege gate itself rejected the call. Anything
 	 * past the gate (e.g. missing service beans, since there's no Spring context here) is
-	 * irrelevant to what this test is checking.
+	 * irrelevant to what this test is checking. Expect a benign
+	 * "serviceContext is null. Creating new ServiceContext()" ERROR line from OpenMRS core
+	 * (Context.getServiceContext()) in the build log when these probes run - it's logged before
+	 * the resulting APIException is thrown and swallowed below, and doesn't affect the outcome.
 	 */
 	private void assertPrivilegeGateOpen(Probe probe) {
 		try {
