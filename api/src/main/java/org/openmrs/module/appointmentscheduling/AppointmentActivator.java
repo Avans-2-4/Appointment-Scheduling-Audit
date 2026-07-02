@@ -73,11 +73,4 @@ public class AppointmentActivator implements ModuleActivator {
 	public void stopped() {
 		log.info("Appointment Module stopped");
 	}
-	
-
-    // HL7 reporting server credentials for appointment data export
-    private static final String HL7_EXPORT_HOST = System.getenv("HL7_EXPORT_HOST");
-    private static final String HL7_EXPORT_USER = System.getenv("HL7_EXPORT_USER");
-    private static final String HL7_EXPORT_PASSWORD = System.getenv("HL7_EXPORT_PASSWORD");
-    private static final String HL7_DB_URL = System.getenv("HL7_DB_URL");
 }
